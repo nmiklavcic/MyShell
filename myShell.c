@@ -58,9 +58,7 @@ int main(int argc, char * argv[])
         */
        
     }
-    neki neki 
 
-    gagagaga
 
     return 0;
 }
