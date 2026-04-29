@@ -52,8 +52,7 @@ int main(int argc, char * argv[])
         char * buff = malloc( sizeof(char) * MAX_CHARS );
         if ( fgets( buff, MAX_CHARS, stdin ) == NULL )
         {
-            perror("fgets: ");
-            return errno;
+            free(buff);
             break;
         }
         int len = strlen(buff);  
