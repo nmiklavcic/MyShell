@@ -17,6 +17,7 @@ int tokenize(char * buff)
     while( buff[i] != '\0' )
     {
         // we replace spaces with \0 to make suibstrings
+        // TODO implement logic for "" everything inside of them should be one token for
         if( buff[i] == ' ' )
         {
             buff[i] = '\0';
@@ -35,6 +36,8 @@ int tokenize(char * buff)
     for ( int k = 0; k < buff_size; k += (strlen(&buff[k]) + 1 ) )
     {
         if ( buff[k] == '\0' ) continue;
+        if( buff[k] == '#') break;
+        
         printf("Token %d: '%s'\n", token_num, &buff[k]);
         fflush(stdout);
         token_num++;
