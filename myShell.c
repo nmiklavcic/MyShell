@@ -50,19 +50,17 @@ int main(int argc, char * argv[])
     {
         // read from stdin
         char * buff = malloc( sizeof(char) * MAX_CHARS );
-        int read_status = read( 0, buff, MAX_CHARS );
-        if ( read_status == -1 )
+        if ( fgets( buff, MAX_CHARS, stdin ) == NULL )
         {
-            perror("Read: ");
+            perror("fgets: ");
             return errno;
-        }  
-        // do stuff only if somethiung actually read :)
-        if ( 0 != (strcmp(buff, "")) )
-        {
-            buff[read_status - 1] = '\0';
-            tokenize(buff);
+            break;
         }
-        
+        int len = strlen(buff);  
+        // do stuff only if somethiung actually read :)
+        if (  len > 0 && buff[len - 1] == '\n')
+        buff[len - 1] = '\0';
+        tokenize(buff);
         /* DEBU 
         printf("%s",buff);
         */
