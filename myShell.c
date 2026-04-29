@@ -30,12 +30,13 @@ int tokenize(char * buff)
         }
     }
 
-    
+    int token_num = 0;
 
     for ( int k = 0; k < buff_size; k += (strlen(&buff[k]) + 1 ) )
     {
-        printf("Token %d: '%s'\n", k, &buff[k]);
+        printf("Token %d: '%s'\n", token_num, &buff[k]);
         fflush(stdout);
+        token_num++;
     }
 
     
