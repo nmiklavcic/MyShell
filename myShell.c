@@ -12,7 +12,7 @@ int tokenize(char * buff)
 {   
     printf("Input line: '%s'\n", buff);
     fflush(stdout);
-    int i = 1;
+    int i = 0;
     int buff_size = strlen(buff);
     while( buff[i] != '\0' )
     {
@@ -34,6 +34,7 @@ int tokenize(char * buff)
 
     for ( int k = 0; k < buff_size; k += (strlen(&buff[k]) + 1 ) )
     {
+        if ( buff[k] == '\0' ) continue;
         printf("Token %d: '%s'\n", token_num, &buff[k]);
         fflush(stdout);
         token_num++;
