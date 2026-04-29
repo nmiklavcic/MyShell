@@ -12,7 +12,8 @@ int tokenize(char * buff)
 {   
     printf("Input line: '%s'\n", buff);
     fflush(stdout);
-    int i = 0;
+    int i = 1;
+    int buff_size = strlen(buff);
     while( buff[i] != '\0' )
     {
         // we replace spaces with \0 to make suibstrings
@@ -28,6 +29,16 @@ int tokenize(char * buff)
             continue;
         }
     }
+
+    
+
+    for ( int k = 0; k < buff_size; k += (strlen(&buff[k]) + 1 ) )
+    {
+        printf("Token %d: '%s'\n", k, &buff[k]);
+        fflush(stdout);
+    }
+
+    
     return 0;
 }
 
@@ -39,26 +50,23 @@ int main(int argc, char * argv[])
         // read from stdin
         char * buff = malloc( sizeof(char) * MAX_CHARS );
         int read_status = read( 0, buff, MAX_CHARS );
+        if ( read_status == -1 )
+        {
+            perror("Read: ");
+            return errno;
+        }  
         // do stuff only if somethiung actually read :)
         if ( 0 != (strcmp(buff, "")) )
         {
             buff[read_status - 1] = '\0';
-
-            if ( read_status == -1 )
-            {
-                perror("Read: ");
-                return errno;
-            }    
-
             tokenize(buff);
         }
         
         /* DEBU 
         printf("%s",buff);
         */
-       
+        
     }
-
 
     return 0;
 }
