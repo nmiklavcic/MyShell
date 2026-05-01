@@ -21,10 +21,10 @@ int tokenize(char * buff)
     while( buff[i] != '\0' )
     {
         // we replace spaces with \0 to make suibstrings
-        if ( buff[i] == '#')
+        if ( buff[i] == '#' && buff[i-1] == '\0')
         {
             buff[i] = '\0';
-            if( buff[i-1] == '\0' ) token_num--;
+            // token_num--;
             break;
         }
         else if( buff[i] == ' ' )
@@ -78,7 +78,9 @@ int tokenize(char * buff)
             continue;
         }
     }
-    token_num++;
+    
+    if ( i > 0 && buff[i-1] != '\0' ) token_num++;
+
     buff_size = strlen(buff);
 
     if(buff_size == 0 && !is_legit)
@@ -121,7 +123,7 @@ int main(int argc, char * argv[])
     while (1)
     {
         // read from stdin
-        char * buff = malloc( sizeof(char) * MAX_CHARS );
+        char * buff = calloc( MAX_CHARS, sizeof(char) );
         if ( fgets( buff, MAX_CHARS, stdin ) == NULL )
         {
             free(buff);
