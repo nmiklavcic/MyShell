@@ -17,10 +17,31 @@ int tokenize(char * buff)
     while( buff[i] != '\0' )
     {
         // we replace spaces with \0 to make suibstrings
-        // TODO implement logic for "" everything inside of them should be one token for
         if( buff[i] == ' ' )
         {
             buff[i] = '\0';
+            i++;
+            continue;
+        }
+        else if ( buff[i] == '"' )
+        {
+            // Find next " and don't do anything with the spaces in between the two
+            // DEBUG
+            // printf("Currently inside of sttring recognition\n");
+            fflush(stdout);
+            i++;
+            while ( buff[i] != '"' )
+            {
+                // DEBUG
+                // printf("Current symbol is : %c\n", buff[i]);
+                // sleep(1);
+                
+                if ( i == buff_size - 2 ) 
+                {
+                    printf("Error! - reached end of line without second %c.\nFix input line %c should always come in pairs.",'"', '"');
+                }
+                i++;
+            }
             i++;
             continue;
         }
