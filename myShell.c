@@ -23,7 +23,7 @@ int tokenize(char * buff)
         // we replace spaces with \0 to make suibstrings
         if ( buff[i] == '#')
         {
-            buff[i] == '\0';
+            buff[i] = '\0';
             if( buff[i-1] == '\0' ) token_num--;
             break;
         }
@@ -91,14 +91,18 @@ int tokenize(char * buff)
 
 int print_tokens(char * buff, int token_num)
 {
-    
 
     int buff_size = strlen(buff);
     int k = 0;
 
     for ( int curr_token = 0; curr_token < token_num; curr_token++ )
     {
-        if ( buff[k] == '\0' ) continue;
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }
         
         printf("Token %d: '%s'\n", curr_token, &buff[k]);
         fflush(stdout);
