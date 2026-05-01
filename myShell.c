@@ -29,6 +29,7 @@ int tokenize(char * buff)
             // DEBUG
             // printf("Currently inside of sttring recognition\n");
             fflush(stdout);
+            buff[i] = '\0';
             i++;
             while ( buff[i] != '"' )
             {
@@ -42,6 +43,7 @@ int tokenize(char * buff)
                 }
                 i++;
             }
+            buff[i] = '\0';
             i++;
             continue;
         }
