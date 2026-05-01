@@ -23,7 +23,7 @@ int tokenize(char * buff)
         // we replace spaces with \0 to make suibstrings
         if ( buff[i] == '#' && buff[i-1] == '\0')
         {
-            buff[i] = '\0';
+            // buff[i] = '\0';
             // token_num--;
             break;
         }
@@ -91,10 +91,51 @@ int tokenize(char * buff)
     return token_num;
 }
 
-int print_tokens(char * buff, int token_num)
+int check_redirect(char * buff, int token_num)
+{
+    // parses tokens for redirect or background execution
+    int k = 0;
+    int start_token = 0;
+
+    if ( token_num >= 3 )
+    {
+        start_token = token_num - 3;
+        for ( int i = 0; i < start_token; i++) k += (strlen(&buff[k]) + 1 );
+    }
+
+    int options_num = 0;
+
+    for ( int curr_token = start_token ; curr_token < token_num; curr_token++ )
+    {
+   
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }
+        else if ( ( buff[k] == '<' || buff[k] == '>' ) && strlen(&buff[k]) > 1 )
+        {
+            options_num++;
+        }
+        else if ( buff[k] == '&' && strlen(&buff[k]) == 1 )
+        {
+            options_num++;
+        }
+        else
+        {
+            // DEBUG
+            // printf("Curr token : %c\n", buff[k]);
+        }
+        k += (strlen(&buff[k]) + 1 );
+    }
+
+    return options_num;
+}
+
+int print_tokens(char * buff, int token_num, int options_num)
 {
 
-    int buff_size = strlen(buff);
     int k = 0;
 
     for ( int curr_token = 0; curr_token < token_num; curr_token++ )
@@ -111,14 +152,68 @@ int print_tokens(char * buff, int token_num)
         k += (strlen(&buff[k]) + 1 );
     }
 
+    if ( options_num > 0 )
+    {
+        int start_char = 0;
+        int start_token = token_num - options_num;
+        
+        for ( int i = 0; i < start_token; i++) start_char += (strlen(&buff[start_char]) + 1 );
+        
+
+        for ( int curr_token = start_token; curr_token < token_num; curr_token++ )
+        {
+            if ( buff[start_char] == '\0' )
+            {
+                start_char += (strlen(&buff[start_char]) + 1 );
+                curr_token--;
+                continue;
+            }
+            if ( buff[start_char] == '<' )
+            {
+                printf("Input redirect: '%s'\n", &buff[start_char + 1]);
+                fflush(stdout);
+            }
+            else if ( buff[start_char] == '>' )
+            {
+                printf("Output redirect: '%s'\n", &buff[start_char + 1]);
+                fflush(stdout);
+            }
+            else if ( buff[start_char] == '&' )
+            {
+                printf("Background: %d\n", 1 /*Probably have to implement multiple background tasks in future*/);
+                fflush(stdout);
+            }
+            else
+            {
+                printf("Error in options count! %c is unknown!\n", buff[start_char]);
+                fflush(stdout);
+                return 1;
+            }
+
+            start_char += (strlen(&buff[start_char]) + 1 );
+        }
+    }
+
     return 0;
+}
+
+int parse(char * buff, int token_num)
+{
+    // DEBUG
+    // printf("Token count : %d\n", token_num);
+
+    int options_num = check_redirect(buff, token_num);
+    // DEBUG
+    // printf("Options count : %d\n", options_num);
+
+    print_tokens(buff, token_num, options_num);
 }
 
 int main(int argc, char * argv[]) 
 {
     // for now lets imagine the read part as a constant while loop
     
-    int token_count = 0;
+    int token_num = 0;
     
     while (1)
     {
@@ -130,15 +225,14 @@ int main(int argc, char * argv[])
             break;
         }
         int len = strlen(buff);  
-        // do stuff only if somethiung actually read :)
+        
+        // do stuff only if something is given as input 
         if (  len > 0 && buff[len - 1] == '\n')
         buff[len - 1] = '\0';
-        token_count = tokenize(buff);
+        
+        token_num = tokenize(buff);
 
-        // DEBUG
-        printf("Token count : %d\n", token_count);
-
-        print_tokens(buff, token_count);
+        parse(buff, token_num);
 
         /* DEBU 
         printf("%s",buff);
