@@ -7,11 +7,17 @@
 #include <string.h>
 
 int MAX_CHARS = 1000;
+int DEBUG_LVL = 1;
+
+char * BUILTINS[] = {"debug"};
 
 int tokenize(char * buff)
 {   
-    printf("Input line: '%s'\n", buff);
-    fflush(stdout); 
+    if ( DEBUG_LVL > 0 )
+    {
+        printf("Input line: '%s'\n", buff);
+        fflush(stdout); 
+    }
 
     int token_num = 0;
     int i = 0;
@@ -58,9 +64,9 @@ int tokenize(char * buff)
                 // printf("Current symbol is : %c\n", buff[i]);
                 // sleep(1);
                 
-                if ( i == buff_size - 2 ) 
+                if ( i == buff_size - 1 ) 
                 {
-                    printf("Error! - reached end of line without second %c.\nFix input line %c should always come in pairs.",'"', '"');
+                    printf("Error! - reached end of line without second %c.\nFix input line %c should always come in pairs.\n",'"', '"');
                     fflush(stdout);
                     return 1;
                 }
@@ -194,6 +200,16 @@ int print_tokens(char * buff, int token_num, int options_num)
         }
     }
 
+    // TODO 
+    // Add recognition of builtin vs external commands and printline 
+    // Executing builtin X / External command X
+
+    return 0;
+}
+
+int find_cmd()
+{
+
     return 0;
 }
 
@@ -203,10 +219,15 @@ int parse(char * buff, int token_num)
     // printf("Token count : %d\n", token_num);
 
     int options_num = check_redirect(buff, token_num);
+    
     // DEBUG
     // printf("Options count : %d\n", options_num);
 
-    print_tokens(buff, token_num, options_num);
+    // print tokens will only be called if debug is enabled ( DEBUG_LVL > 0 )
+    if ( DEBUG_LVL > 0 ) print_tokens(buff, token_num, options_num);
+
+    find_cmd();
+
 }
 
 int main(int argc, char * argv[]) 
