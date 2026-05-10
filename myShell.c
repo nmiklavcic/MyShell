@@ -14,10 +14,13 @@ typedef struct {
 } Builtin;
 
 char PROMPT[9] = "mysh";
+
 int MAX_CHARS = 1000;
 int DEBUG_LVL = 0;
 int IS_BUILTIN = 0;
 int BACKGROUND = 0;
+
+int STATUS = 0;
 
 // section where builtins will live 
 
@@ -50,19 +53,31 @@ int prompt(char * buff, int token_num)
     {
         int prpt_start = strlen(&buff[0]) + 1;
         while ( buff[prpt_start] == '\0' ) prpt_start++;
-        if ( strlen(&buff[prpt_start]) > 8 ) return 1;
+        if ( strlen(&buff[prpt_start]) > 8 ) 
+        {
+            STATUS = 1;
+            return 1;
+        }
         strcpy(PROMPT, &buff[prpt_start]);
     }
 
     return 0;
 }
 
+int status(char * buff, int token_num)
+{
+    printf("%d\n", STATUS);
+    fflush(stdout);
+    return STATUS;
+}
+
 Builtin BUILTINS[] = {
     {"debug", debug},
-    {"prompt", prompt}
+    {"prompt", prompt},
+    {"status", status}
 };
 
-int BUILTIN_NUM = 2;
+int BUILTIN_NUM = 3;
 
 int tokenize(char * buff)
 {   
