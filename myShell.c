@@ -112,7 +112,7 @@ int tokenize(char * buff)
     while( buff[i] != '\0' )
     {
         // we replace spaces with \0 to make suibstrings
-        if ( buff[i] == '#' && buff[i-1] == '\0')
+        if ( buff[i] == '#' && i != 0 && buff[i-1] == '\0')
         {
             // buff[i] = '\0';
             // token_num--;
@@ -378,6 +378,7 @@ int parse(char * buff, int token_num)
         execute_external(buff);
     }
 
+    return 0;
 }
 
 int main(int argc, char * argv[]) 
@@ -411,7 +412,7 @@ int main(int argc, char * argv[])
         /* DEBU 
         printf("%s",buff);
         */
-        
+        free(buff);
     }
 
     return STATUS;
