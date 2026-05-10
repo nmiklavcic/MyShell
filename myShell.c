@@ -238,7 +238,7 @@ int print_tokens(char * buff, int token_num, int options_num)
     // Executing builtin X / External command X
     if ( IS_BUILTIN == 0 )
     {
-        if ( BACKGROUND )
+        if ( BACKGROUND == 0 )
         {
             printf("Executing builtin '%s' in foreground\n", &buff[0]);
             fflush(stdout);
