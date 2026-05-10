@@ -79,9 +79,10 @@ int my_exit(char * buff, int token_num)
         while ( buff[ext_num_start] == '\0' ) ext_num_start++;
         STATUS = atoi(&buff[ext_num_start]);
     }
-    
-    printf("Exit status: %d\n", STATUS);
-    fflush(stdout);
+
+    // DEBUG
+    // printf("Exit status: %d\n", STATUS);
+    // fflush(stdout);
     EXIT = 1;
     return STATUS;
 }
