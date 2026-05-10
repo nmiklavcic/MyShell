@@ -55,7 +55,6 @@ int prompt(char * buff, int token_num)
         while ( buff[prpt_start] == '\0' ) prpt_start++;
         if ( strlen(&buff[prpt_start]) > 8 ) 
         {
-            STATUS = 1;
             return 1;
         }
         strcpy(PROMPT, &buff[prpt_start]);
@@ -312,7 +311,7 @@ int execute_builtin(char * buff, int token_num)
     {
         if ( strcmp(&buff[0], BUILTINS[i].name) == 0 )
         {
-            BUILTINS[i].fn(buff, token_num);
+            STATUS = BUILTINS[i].fn(buff, token_num);
         }
     }
     return 0;
