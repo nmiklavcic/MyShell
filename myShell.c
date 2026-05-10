@@ -301,7 +301,18 @@ int print_tokens(char * buff, int token_num, int options_num)
     }
     else
     {
-        printf("External command '%s'\n", "placeholder"/*Print the input line commands without redirects and comments*/ );
+        int k = 0;
+        printf("External command '");
+        fflush(stdout);
+        for ( int i = 0; i < token_num - options_num; i++ )
+        {
+            printf("%s", &buff[k]);
+            fflush(stdout);
+            if ( i < token_num - options_num - 1 ) printf(" ");
+            fflush(stdout);
+            k += strlen(&buff[k]) + 1;
+        }
+        printf("'\n");
         fflush(stdout);
     }
 
@@ -371,16 +382,15 @@ int parse(char * buff, int token_num)
 
 int main(int argc, char * argv[]) 
 {
-    // reset pub variables
-    IS_BUILTIN = 0;
-    BACKGROUND = 0;
-
     // for now lets imagine the read part as a constant while loop
     
     int token_num = 0;
     
     while (EXIT == 0)
     {
+        // reset pub variables
+        IS_BUILTIN = 0;
+        BACKGROUND = 0;
         // read from stdin
         char * buff = calloc( MAX_CHARS, sizeof(char) );
         if ( fgets( buff, MAX_CHARS, stdin ) == NULL )
