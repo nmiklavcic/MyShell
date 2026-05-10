@@ -49,6 +49,7 @@ int prompt(char * buff, int token_num)
     else
     {
         int prpt_start = strlen(&buff[0]) + 1;
+        while ( buff[prpt_start] == '\0' ) prpt_start++;
         if ( strlen(&buff[prpt_start]) > 8 ) return 1;
         strcpy(PROMPT, &buff[prpt_start]);
     }
