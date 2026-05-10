@@ -13,7 +13,7 @@ typedef struct {
     function fn;
 } Builtin;
 
-
+char PROMPT[9] = "mysh";
 int MAX_CHARS = 1000;
 int DEBUG_LVL = 0;
 int IS_BUILTIN = 0;
@@ -27,6 +27,7 @@ int debug(char * buff, int token_num)
     {
         // only token is debug so we print what debug level we are on
         printf("%d\n", DEBUG_LVL);
+        fflush(stdout);
     }
     else
     {
@@ -37,11 +38,30 @@ int debug(char * buff, int token_num)
     return 0;
 }
 
+int prompt(char * buff, int token_num)
+{
+    if ( token_num == 1 )
+    {
+        // only token is debug so we print what debug level we are on
+        printf("%s\n", &PROMPT[0]);
+        fflush(stdout);
+    }
+    else
+    {
+        int prpt_start = strlen(&buff[0]) + 1;
+        if ( strlen(&buff[prpt_start]) > 8 ) return 1;
+        strcpy(PROMPT, &buff[prpt_start]);
+    }
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
-    {"debug", debug}
+    {"debug", debug},
+    {"prompt", prompt}
 };
 
-int BUILTIN_NUM = 1;
+int BUILTIN_NUM = 2;
 
 int tokenize(char * buff)
 {   
@@ -233,9 +253,6 @@ int print_tokens(char * buff, int token_num, int options_num)
         }
     }
 
-    // TODO 
-    // Add recognition of builtin vs external commands and printline 
-    // Executing builtin X / External command X
     if ( IS_BUILTIN == 0 )
     {
         if ( BACKGROUND == 0 )
