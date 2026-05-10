@@ -6,10 +6,42 @@
 #include <errno.h>
 #include <string.h>
 
-int MAX_CHARS = 1000;
-int DEBUG_LVL = 1;
+typedef int (*function)(char * buff, int token_num);
 
-char * BUILTINS[] = {"debug"};
+typedef struct {
+    char * name;
+    function fn;
+} Builtin;
+
+
+int MAX_CHARS = 1000;
+int DEBUG_LVL = 0;
+int IS_BUILTIN = 0;
+int BACKGROUND = 0;
+
+// section where builtins will live 
+
+int debug(char * buff, int token_num)
+{
+    if ( token_num == 1 )
+    {
+        // only token is debug so we print what debug level we are on
+        printf("%d\n", DEBUG_LVL);
+    }
+    else
+    {
+        int lvl_start = strlen(&buff[0]) + 1;
+        DEBUG_LVL = atoi(&buff[lvl_start]);
+    }
+
+    return 0;
+}
+
+Builtin BUILTINS[] = {
+    {"debug", debug}
+};
+
+int BUILTIN_NUM = 1;
 
 int tokenize(char * buff)
 {   
@@ -186,7 +218,8 @@ int print_tokens(char * buff, int token_num, int options_num)
             }
             else if ( buff[start_char] == '&' )
             {
-                printf("Background: %d\n", 1 /*Probably have to implement multiple background tasks in future*/);
+                BACKGROUND = 1;
+                printf("Background: %d\n", BACKGROUND /*Probably have to implement multiple background tasks in future*/);
                 fflush(stdout);
             }
             else
@@ -203,11 +236,56 @@ int print_tokens(char * buff, int token_num, int options_num)
     // TODO 
     // Add recognition of builtin vs external commands and printline 
     // Executing builtin X / External command X
+    if ( IS_BUILTIN == 0 )
+    {
+        if ( BACKGROUND )
+        {
+            printf("Executing builtin '%s' in foreground\n", &buff[0]);
+            fflush(stdout);
+        }
+        else
+        {
+            printf("Executing builtin '%s' in background\n", &buff[0]);
+            fflush(stdout);
+        }
+    }
+    else
+    {
+        printf("External command '%s'\n", "placeholder"/*Print the input line commands without redirects and comments*/ );
+        fflush(stdout);
+    }
 
     return 0;
 }
 
-int find_cmd()
+int check_builtin(char * token)
+{
+    // Check if command is builtin 
+    // return 0 on yes, 1 on no 
+    for ( int i = 0; i < BUILTIN_NUM; i++ )
+    {
+        if ( strcmp(token, BUILTINS[i].name) == 0 )
+        {
+            // the command is builtin
+            return 0;
+        }
+    } 
+    return 1;
+}
+
+int execute_builtin(char * buff, int token_num)
+{
+    for ( int i = 0; i < BUILTIN_NUM; i++ )
+    {
+        if ( strcmp(&buff[0], BUILTINS[i].name) == 0 )
+        {
+            BUILTINS[i].fn(buff, token_num);
+        }
+    }
+    return 0;
+}
+
+int execute_external(char * buff)
 {
 
     return 0;
@@ -223,15 +301,30 @@ int parse(char * buff, int token_num)
     // DEBUG
     // printf("Options count : %d\n", options_num);
 
+    // check if command is builtin, pass the first token of the buffer
+    IS_BUILTIN = check_builtin(&buff[0]);
+
     // print tokens will only be called if debug is enabled ( DEBUG_LVL > 0 )
     if ( DEBUG_LVL > 0 ) print_tokens(buff, token_num, options_num);
 
-    find_cmd();
+    // execute command
+    if ( IS_BUILTIN == 0 )
+    {
+        execute_builtin(buff, token_num);
+    }
+    else
+    {
+        execute_external(buff);
+    }
 
 }
 
 int main(int argc, char * argv[]) 
 {
+    // reset pub variables
+    IS_BUILTIN = 0;
+    BACKGROUND = 0;
+
     // for now lets imagine the read part as a constant while loop
     
     int token_num = 0;
