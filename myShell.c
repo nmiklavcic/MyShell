@@ -21,10 +21,11 @@ int IS_BUILTIN = 0;
 int BACKGROUND = 0;
 
 int STATUS = 0;
+int EXIT = 0;
 
 // section where builtins will live 
 
-int debug(char * buff, int token_num)
+int my_debug(char * buff, int token_num)
 {
     if ( token_num == 1 )
     {
@@ -41,11 +42,11 @@ int debug(char * buff, int token_num)
     return 0;
 }
 
-int prompt(char * buff, int token_num)
+int my_prompt(char * buff, int token_num)
 {
     if ( token_num == 1 )
     {
-        // only token is debug so we print what debug level we are on
+        // only token is prompt so we print what prompt is currently set
         printf("%s\n", &PROMPT[0]);
         fflush(stdout);
     }
@@ -63,20 +64,36 @@ int prompt(char * buff, int token_num)
     return 0;
 }
 
-int status(char * buff, int token_num)
+int my_status(char * buff, int token_num)
 {
     printf("%d\n", STATUS);
     fflush(stdout);
     return STATUS;
 }
 
+int my_exit(char * buff, int token_num)
+{
+    if ( token_num > 1 )
+    {
+        int ext_num_start = strlen(&buff[0]) + 1;
+        while ( buff[ext_num_start] == '\0' ) ext_num_start++;
+        STATUS = atoi(&buff[ext_num_start]);
+    }
+    
+    printf("Exit status: %d\n", STATUS);
+    fflush(stdout);
+    EXIT = 1;
+    return STATUS;
+}
+
 Builtin BUILTINS[] = {
-    {"debug", debug},
-    {"prompt", prompt},
-    {"status", status}
+    {"debug", my_debug},
+    {"prompt", my_prompt},
+    {"status", my_status},
+    {"exit", my_exit}
 };
 
-int BUILTIN_NUM = 3;
+int BUILTIN_NUM = 4;
 
 int tokenize(char * buff)
 {   
@@ -361,7 +378,7 @@ int main(int argc, char * argv[])
     
     int token_num = 0;
     
-    while (1)
+    while (EXIT == 0)
     {
         // read from stdin
         char * buff = calloc( MAX_CHARS, sizeof(char) );
@@ -386,5 +403,5 @@ int main(int argc, char * argv[])
         
     }
 
-    return 0;
+    return STATUS;
 }
