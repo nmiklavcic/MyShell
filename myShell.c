@@ -110,15 +110,40 @@ int my_print(char * buff, int token_num)
     }
 }
 
+int my_echo(char * buff, int token_num)
+{
+    // skip echo 
+    // start printing everything after that 
+    // skip # 
+    int k = strlen(&buff[0]) + 1;
+
+    for ( int curr_token = 1; curr_token < token_num; curr_token++ )
+    {
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }
+        
+        printf("%s", &buff[k]);
+        if ( curr_token < token_num - 1 ) printf(" ");
+        else if ( curr_token == token_num - 1 ) printf("\n");
+        fflush(stdout);
+        k += (strlen(&buff[k]) + 1 );
+    }
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
     {"status", my_status},
     {"exit", my_exit},
-    {"print", my_print}
+    {"print", my_print},
+    {"echo", my_echo}
 };
 
-int BUILTIN_NUM = 5;
+int BUILTIN_NUM = 6;
 
 int tokenize(char * buff)
 {   
