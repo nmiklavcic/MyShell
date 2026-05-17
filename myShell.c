@@ -395,7 +395,7 @@ int my_dirls(char * buff, int token_num)
     {
         printf("dirls: %s: '%s'\n", strerror(errno), path);
         fflush(stdout);
-        return 1;
+        return errno;
     }
 
     struct dirent *entry;
@@ -419,6 +419,24 @@ int my_dirls(char * buff, int token_num)
     return 0;
 }
 
+int my_unlink(char * buff, int token_num)
+{
+    if ( token_num < 2 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    if ( unlink(&buff[start]) == -1 )
+    {
+        printf("unlink: %s: '%s'\n", strerror(errno), &buff[start]);
+        fflush(stdout);
+        return errno;
+    }
+
+    return 0;
+}
+
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -435,10 +453,12 @@ Builtin BUILTINS[] = {
     {"dirwd", my_dirwd},
     {"dirmk", my_dirmk},
     {"dirrm", my_dirrm},
-    {"dirls", my_dirls}
+    {"dirls", my_dirls},
+    {"rename", my_rename},
+    {"unlik", my_unlink}
 };
 
-int BUILTIN_NUM = 16;
+int BUILTIN_NUM = 17;
 
 int tokenize(char * buff)
 {   
