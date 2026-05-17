@@ -294,6 +294,17 @@ int my_dirname(char * buff, int token_num)
     return 0;
 }
 
+int my_dirch(char * buff, int token_num)
+{
+    if ( token_num == 1 ) chdir("/");
+
+    int start = (int)strlen(&buff[0]) + 1;
+
+    chdir(&buff[start]);
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -305,10 +316,11 @@ Builtin BUILTINS[] = {
     {"sum", my_sum},
     {"calc", my_calc},
     {"basename", my_basename},
-    {"dirname", my_dirname}
+    {"dirname", my_dirname},
+    {"dirch", my_dirch}
 };
 
-int BUILTIN_NUM = 11;
+int BUILTIN_NUM = 12;
 
 int tokenize(char * buff)
 {   
