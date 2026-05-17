@@ -156,8 +156,10 @@ int my_len(char * buff, int token_num)
     }
     // subtract length of len and the first space
     k -= (int)strlen(&buff[0]) + 1;
-    // subtract 1 extra for the additional one that gets added in each for loop step
-    if ( k != 0 ) k -= 1;
+    // we also need to subtract the token num 
+    // this acts as a sbtraction of spaces 
+    k -= token_num - 1;
+    
     printf("%d\n",k);
 
     return 0;
