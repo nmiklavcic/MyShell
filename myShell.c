@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 typedef int (*function)(char * buff, int token_num);
 
@@ -307,7 +309,7 @@ int my_dirch(char * buff, int token_num)
 
     if ( -1 == chdir(&buff[start])) 
     {
-        printf("dirch: No such file or directory\n");
+        printf("dirch: %s\n", strerror(errno));
         return errno;
     }
 
@@ -345,6 +347,78 @@ int my_dirwd(char * buff, int token_num)
     return 0;
 }
 
+int my_dirmk(char * buff, int token_num)
+{
+    int start = (int)strlen(&buff[0]) + 1;
+    
+    if ( mkdir(&buff[start], 0755) == -1 )
+    {
+        printf("dirmk: %s\n",strerror(errno));
+        return errno;
+    }
+
+    return 0;
+}
+
+int my_dirrm(char * buff, int token_num)
+{
+    int start = (int)strlen(&buff[0]) + 1;
+    
+    if ( rmdir(&buff[start]) == -1 )
+    {
+        printf("dirrm: %s\n",strerror(errno));
+        return errno;
+    }
+
+    return 0;
+}
+
+int my_dirls(char * buff, int token_num)
+{
+    char *path;
+    char cwd[1024];
+
+    if ( token_num < 2 )
+    {
+        getcwd(cwd, 1024);
+        path = cwd;
+    }
+    else
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        while ( buff[start] == '\0' ) start++;
+        path = &buff[start];
+    }
+
+    DIR *dir = opendir(path);
+    if ( dir == NULL )
+    {
+        printf("dirls: %s: '%s'\n", strerror(errno), path);
+        fflush(stdout);
+        return 1;
+    }
+
+    struct dirent *entry;
+    int first = 1;
+    while ( (entry = readdir(dir)) != NULL )
+    {
+        if ( first )
+        {
+            printf("%s", entry->d_name);
+            first = 0;
+        }
+        else
+        {
+            printf("  %s", entry->d_name);
+        }
+    }
+    printf("\n");
+
+    fflush(stdout);
+    closedir(dir);
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -359,10 +433,12 @@ Builtin BUILTINS[] = {
     {"dirname", my_dirname},
     {"dirch", my_dirch},
     {"dirwd", my_dirwd},
-    {"dirmk", my_dirmk}
+    {"dirmk", my_dirmk},
+    {"dirrm", my_dirrm},
+    {"dirls", my_dirls}
 };
 
-int BUILTIN_NUM = 14;
+int BUILTIN_NUM = 16;
 
 int tokenize(char * buff)
 {   
