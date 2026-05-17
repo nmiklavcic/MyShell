@@ -459,6 +459,22 @@ int my_rename(char * buff, int token_num)
     return 0;
 }
 
+int my_remove(char * buff, int token_num)
+{
+    if ( token_num < 2 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    if ( remove(&buff[start]) == -1 )
+    {
+        printf("remove: %s: '%s'\n", strerror(errno), &buff[start]);
+        fflush(stdout);
+        return 1;
+    }
+    return 0;
+}
+
 
 Builtin BUILTINS[] = {
     {"debug", my_debug},
@@ -478,7 +494,8 @@ Builtin BUILTINS[] = {
     {"dirrm", my_dirrm},
     {"dirls", my_dirls},
     {"rename", my_rename},
-    {"unlik", my_unlink}
+    {"unlik", my_unlink},
+    {"remove", my_remove}
 };
 
 int BUILTIN_NUM = 18;
