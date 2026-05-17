@@ -189,6 +189,50 @@ int my_sum(char * buff, int token_num)
     return 0;
 }
 
+int my_calc(char * buff, int token_num)
+{
+    // only accepts 3 arguments
+    if ( token_num > 4 )
+    {
+        return 1;
+    }
+
+    int k = strlen(&buff[0]) + 1;
+
+    int num1 = atoi(&buff[k]);
+    
+    k += strlen(&buff[k]) + 1;
+
+    char op = buff[k];
+
+    k += strlen(&buff[k]) + 1;
+
+    int num2 = atoi(&buff[k]);
+
+    // DEBUG
+    // printf("%d %c %d\n", num1, op, num2);
+
+    switch(op)
+    {
+        case '+':
+            printf("%d\n", num1 + num2);
+            break;
+        case '-':
+            printf("%d\n", num1 - num2);
+            break;
+        case '*':
+            printf("%d\n", num1 * num2);
+            break;
+        case '/':
+            printf("%d\n",num1 / num2);
+            break;
+        case '%':
+            printf("%d\n",num1 % num2);
+            break;
+    }
+    
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -197,10 +241,11 @@ Builtin BUILTINS[] = {
     {"print", my_print},
     {"echo", my_echo},
     {"len", my_len},
-    {"sum", my_sum}
+    {"sum", my_sum},
+    {"calc", my_calc}
 };
 
-int BUILTIN_NUM = 8;
+int BUILTIN_NUM = 10;
 
 int tokenize(char * buff)
 {   
