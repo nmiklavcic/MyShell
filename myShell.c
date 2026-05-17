@@ -159,8 +159,32 @@ int my_len(char * buff, int token_num)
     // we also need to subtract the token num 
     // this acts as a sbtraction of spaces 
     k -= token_num - 1;
-    
+
     printf("%d\n",k);
+
+    return 0;
+}
+
+int my_sum(char * buff, int token_num)
+{
+    // skip len
+    // count everything else
+    int k = strlen(&buff[0]) + 1;
+    int sum = 0;
+
+    for ( int curr_token = 1; curr_token < token_num; curr_token++ )
+    {
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }   
+        sum += atoi(&buff[k]);
+        k += (strlen(&buff[k]) + 1);
+    }
+
+    printf("%d\n",sum);
 
     return 0;
 }
@@ -172,10 +196,11 @@ Builtin BUILTINS[] = {
     {"exit", my_exit},
     {"print", my_print},
     {"echo", my_echo},
-    {"len", my_len}
+    {"len", my_len},
+    {"sum", my_sum}
 };
 
-int BUILTIN_NUM = 7;
+int BUILTIN_NUM = 8;
 
 int tokenize(char * buff)
 {   
