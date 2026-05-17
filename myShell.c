@@ -104,6 +104,7 @@ int my_print(char * buff, int token_num)
         }
         
         printf("%s", &buff[k]);
+        if ( curr_token < token_num - 1 ) printf(" ");
         fflush(stdout);
         k += (strlen(&buff[k]) + 1 );
     }
