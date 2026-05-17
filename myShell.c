@@ -108,6 +108,8 @@ int my_print(char * buff, int token_num)
         fflush(stdout);
         k += (strlen(&buff[k]) + 1 );
     }
+
+    return 0;
 }
 
 int my_echo(char * buff, int token_num)
@@ -132,6 +134,31 @@ int my_echo(char * buff, int token_num)
         fflush(stdout);
         k += (strlen(&buff[k]) + 1 );
     }
+
+    return 0;
+}
+
+int my_len(char * buff, int token_num)
+{
+    // skip len
+    // count everything else
+    int k = strlen(&buff[0]) + 1;
+
+    for ( int curr_token = 1; curr_token < token_num; curr_token++ )
+    {
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }   
+        k += (strlen(&buff[k]) + 1);
+    }
+    // subtract length of len and the first space
+    // subtract 1 extra for the additional one that gets added in each for loop step
+    printf("%d\n", k - (int)strlen(&buff[0]) - 2 );
+
+    return 0;
 }
 
 Builtin BUILTINS[] = {
@@ -140,10 +167,11 @@ Builtin BUILTINS[] = {
     {"status", my_status},
     {"exit", my_exit},
     {"print", my_print},
-    {"echo", my_echo}
+    {"echo", my_echo},
+    {"len", my_len}
 };
 
-int BUILTIN_NUM = 6;
+int BUILTIN_NUM = 7;
 
 int tokenize(char * buff)
 {   
