@@ -297,11 +297,19 @@ int my_dirname(char * buff, int token_num)
 
 int my_dirch(char * buff, int token_num)
 {
-    if ( token_num == 1 ) chdir("/");
+    if ( token_num == 1 )
+    {
+        chdir("/");
+        return 0;
+    }
 
     int start = (int)strlen(&buff[0]) + 1;
 
-    chdir(&buff[start]);
+    if ( -1 == chdir(&buff[start])) 
+    {
+        printf("dirch: No such file or directory\n");
+        return errno;
+    }
 
     return 0;
 }
@@ -329,12 +337,11 @@ int my_dirwd(char * buff, int token_num)
                 end = k;
             }  
         }
-        printf("%s\n", &curr_dir[end]);
+        if (strlen(curr_dir) == 1) printf("%s\n", &curr_dir[end - 1]);
+        else printf("%s\n", &curr_dir[end]);
     }
 
     fflush(stdout);
-    return 0;
-
     return 0;
 }
 
@@ -351,10 +358,11 @@ Builtin BUILTINS[] = {
     {"basename", my_basename},
     {"dirname", my_dirname},
     {"dirch", my_dirch},
-    {"dirwd", my_dirwd}
+    {"dirwd", my_dirwd},
+    {"dirmk", my_dirmk}
 };
 
-int BUILTIN_NUM = 13;
+int BUILTIN_NUM = 14;
 
 int tokenize(char * buff)
 {   
