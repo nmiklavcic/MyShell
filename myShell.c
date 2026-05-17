@@ -436,6 +436,29 @@ int my_unlink(char * buff, int token_num)
     return 0;
 }
 
+int my_rename(char * buff, int token_num)
+{
+    if ( token_num < 3 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    char *arg1 = &buff[start];
+
+    int next = start + (int)strlen(arg1) + 1;
+    while ( buff[next] == '\0' ) next++;
+
+    char *arg2 = &buff[next];
+
+    if ( rename(arg1, arg2) == -1 )
+    {
+        printf("rename: %s: '%s'\n", strerror(errno), arg1);
+        fflush(stdout);
+        return errno;
+    }
+    return 0;
+}
+
 
 Builtin BUILTINS[] = {
     {"debug", my_debug},
@@ -458,7 +481,7 @@ Builtin BUILTINS[] = {
     {"unlik", my_unlink}
 };
 
-int BUILTIN_NUM = 17;
+int BUILTIN_NUM = 18;
 
 int tokenize(char * buff)
 {   
