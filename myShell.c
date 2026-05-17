@@ -130,10 +130,11 @@ int my_echo(char * buff, int token_num)
         
         printf("%s", &buff[k]);
         if ( curr_token < token_num - 1 ) printf(" ");
-        else if ( curr_token == token_num - 1 ) printf("\n");
-        fflush(stdout);
         k += (strlen(&buff[k]) + 1 );
     }
+
+    printf("\n");
+    fflush(stdout);
 
     return 0;
 }
@@ -243,7 +244,7 @@ int my_basename(char * buff, int token_num)
    
     int start = (int)strlen(&buff[0]) + 1;
     // DEBUG
-    // printf("%d\n", (int)strlen(&buff[start]));
+     printf("%d\n", (int)strlen(&buff[start]));
 
     for ( int k = start; k < strlen(&buff[0]) + 1 + strlen(&buff[start]); k++ )
     {
@@ -271,7 +272,7 @@ int my_dirname(char * buff, int token_num)
    
     int start = (int)strlen(&buff[0]) + 1;
     // DEBUG
-    // printf("%d\n", (int)strlen(&buff[start]));
+     printf("%d\n", (int)strlen(&buff[start]));
     int last_slsh = 0;
 
     for ( int k = start; k < strlen(&buff[0]) + 1 + strlen(&buff[start]); k++ )
@@ -305,6 +306,38 @@ int my_dirch(char * buff, int token_num)
     return 0;
 }
 
+int my_dirwd(char * buff, int token_num)
+{
+    char * curr_dir = calloc(1024, sizeof(char));
+    getcwd(curr_dir, 1024);
+
+    int start = (int)strlen(&buff[0]) + 1;
+    char flag = (token_num > 1) ? buff[start] : 'b';
+
+    if ( flag == 'f' )
+    {
+        printf("%s\n", curr_dir);
+    }
+    else if ( flag == 'b' )
+    {
+        int end = 0;
+        for ( int k = 0; k < strlen(&curr_dir[0]); k++ )
+        {
+            if ( curr_dir[k] == '/' )
+            {
+                k += 1;
+                end = k;
+            }  
+        }
+        printf("%s\n", &curr_dir[end]);
+    }
+
+    fflush(stdout);
+    return 0;
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -317,10 +350,11 @@ Builtin BUILTINS[] = {
     {"calc", my_calc},
     {"basename", my_basename},
     {"dirname", my_dirname},
-    {"dirch", my_dirch}
+    {"dirch", my_dirch},
+    {"dirwd", my_dirwd}
 };
 
-int BUILTIN_NUM = 12;
+int BUILTIN_NUM = 13;
 
 int tokenize(char * buff)
 {   
