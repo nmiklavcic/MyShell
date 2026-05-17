@@ -475,6 +475,132 @@ int my_remove(char * buff, int token_num)
     return 0;
 }
 
+int my_linkhard(char * buff, int token_num)
+{
+    if ( token_num < 3 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    char *goal = &buff[start];
+
+    int next = start + (int)strlen(goal) + 1;
+    while ( buff[next] == '\0' ) next++;
+
+    char *name = &buff[next];
+
+    if ( link(goal, name) == -1 )
+    {
+        printf("linkhard: %s: '%s'\n", strerror(errno), goal);
+        fflush(stdout);
+        return 1;
+    }
+    return 0;
+}
+
+int my_linksoft(char * buff, int token_num)
+{
+    if ( token_num < 3 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    char *goal = &buff[start];
+
+    int next = start + (int)strlen(goal) + 1;
+    while ( buff[next] == '\0' ) next++;
+
+    char *name = &buff[next];
+
+    if ( symlink(goal, name) == -1 )
+    {
+        printf("linksoft: %s: '%s'\n", strerror(errno), goal);
+        fflush(stdout);
+        return 1;
+    }
+    return 0;
+}
+
+int my_linkread(char * buff, int token_num)
+{
+    if ( token_num < 2 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    char target[1024];
+
+    ssize_t len = readlink(&buff[start], target, sizeof(target) - 1);
+    if ( len == -1 )
+    {
+        printf("linkread: %s: '%s'\n", strerror(errno), &buff[start]);
+        fflush(stdout);
+        return 1;
+    }
+
+    target[len] = '\0';
+    printf("%s\n", target);
+    fflush(stdout);
+    return 0;
+}
+
+int my_linklist(char * buff, int token_num)
+{
+    if ( token_num < 2 ) return 1;
+
+    int start = (int)strlen(&buff[0]) + 1;
+    while ( buff[start] == '\0' ) start++;
+
+    char *path = &buff[start];
+
+    struct stat target_stat;
+    if ( stat(path, &target_stat) == -1 )
+    {
+        printf("linklist: %s: '%s'\n", strerror(errno), path);
+        fflush(stdout);
+        return 1;
+    }
+
+    char cwd[1024];
+    getcwd(cwd, 1024);
+
+    DIR *dir = opendir(cwd);
+    if ( dir == NULL )
+    {
+        printf("linklist: %s\n", strerror(errno));
+        fflush(stdout);
+        return 1;
+    }
+
+    struct dirent *entry;
+    struct stat entry_stat;
+    char entry_path[1024];
+    int first = 1;
+
+    while ( (entry = readdir(dir)) != NULL )
+    {
+        snprintf(entry_path, sizeof(entry_path), "%s/%s", cwd, entry->d_name);
+        if ( stat(entry_path, &entry_stat) == -1 ) continue;
+
+        if ( entry_stat.st_ino == target_stat.st_ino && entry_stat.st_dev == target_stat.st_dev )
+        {
+            if ( first )
+            {
+                printf("%s", entry->d_name);
+                first = 0;
+            }
+            else
+            {
+                printf("  %s", entry->d_name);
+            }
+        }
+    }
+    printf("\n");
+    fflush(stdout);
+    closedir(dir);
+    return 0;
+}
+
 
 Builtin BUILTINS[] = {
     {"debug", my_debug},
@@ -494,11 +620,15 @@ Builtin BUILTINS[] = {
     {"dirrm", my_dirrm},
     {"dirls", my_dirls},
     {"rename", my_rename},
-    {"unlik", my_unlink},
-    {"remove", my_remove}
+    {"unlink", my_unlink},
+    {"remove", my_remove},
+    {"linkhard", my_linkhard},
+    {"linksoft", my_linksoft},
+    {"linkread", my_linkread},
+    {"linklist", my_linklist}
 };
 
-int BUILTIN_NUM = 18;
+int BUILTIN_NUM = 23;
 
 int tokenize(char * buff)
 {   
