@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 typedef int (*function)(char * buff, int token_num);
 
@@ -601,6 +602,75 @@ int my_linklist(char * buff, int token_num)
     return 0;
 }
 
+int my_cpcat(char * buff, int token_num)
+{
+    int in, out;
+
+    if ( token_num == 1 )
+    {
+        in = 0;
+        out = 1;
+    }
+    else if ( token_num == 2 )
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        while ( buff[start] == '\0' ) start++;
+        in = open(&buff[start], O_RDONLY);
+        if ( in == -1 )
+        {
+            printf("cpcat: %s\n", strerror(errno));
+            fflush(stdout);
+            return errno;
+        }
+        out = 1;
+    }
+    else if ( token_num == 3 )
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        while ( buff[start] == '\0' ) start++;
+        char *arg1 = &buff[start];
+
+        int next = start + (int)strlen(arg1) + 1;
+        while ( buff[next] == '\0' ) next++;
+        char *arg2 = &buff[next];
+
+        in = open(arg1, O_RDONLY);
+        if ( in == -1 )
+        {
+            printf("cpcat: %s\n", strerror(errno));
+            fflush(stdout);
+            return errno;
+        }
+        out = open(arg2, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if ( out == -1 )
+        {
+            printf("cpcat: %s\n", strerror(errno));
+            fflush(stdout);
+            close(in);
+            return errno;
+        }
+    }
+    else return 1;
+
+    char c;
+    while ( read(in, &c, 1) > 0 )
+    {
+        if ( write(out, &c, 1) == -1 )
+        {
+            printf("cpcat: write error: %s\n", strerror(errno));
+            fflush(stdout);
+            if ( in != 0 ) close(in);
+            if ( out != 1 ) close(out);
+            return errno;
+        }
+    }
+
+    if ( in != 0 ) close(in);
+    if ( out != 1 ) close(out);
+    return 0;
+}
+
+
 
 Builtin BUILTINS[] = {
     {"debug", my_debug},
@@ -625,10 +695,11 @@ Builtin BUILTINS[] = {
     {"linkhard", my_linkhard},
     {"linksoft", my_linksoft},
     {"linkread", my_linkread},
-    {"linklist", my_linklist}
+    {"linklist", my_linklist},
+    {"cpcat", my_cpcat}
 };
 
-int BUILTIN_NUM = 23;
+int BUILTIN_NUM = 24;
 
 int tokenize(char * buff)
 {   
