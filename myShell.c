@@ -231,6 +231,7 @@ int my_calc(char * buff, int token_num)
             break;
     }
     
+    return 0;
 }
 
 Builtin BUILTINS[] = {
