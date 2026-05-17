@@ -234,6 +234,38 @@ int my_calc(char * buff, int token_num)
     return 0;
 }
 
+int my_basename(char * buff, int token_num)
+{
+    if ( token_num == 1 )
+    {
+        return 1;
+    }
+
+    char * basename = calloc(1024,sizeof(char));
+
+   
+    int start = (int)strlen(&buff[0]) + 1;
+    // DEBUG
+    // printf("%d\n", (int)strlen(&buff[start]));
+
+    for ( int k = start; k < strlen(&buff[0]) + 1 + strlen(&buff[start]); k++ )
+    {
+        // DEBUG
+        // printf("%s\n",&buff[k]);
+        // printf("%d\n",k);
+        if ( buff[k] == '/' )
+        {
+            k += 1;
+            strcpy(basename, &buff[k]);
+        }  
+    }
+
+    printf("%s\n", basename);
+    
+    free(basename);
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -243,7 +275,8 @@ Builtin BUILTINS[] = {
     {"echo", my_echo},
     {"len", my_len},
     {"sum", my_sum},
-    {"calc", my_calc}
+    {"calc", my_calc},
+    {"basename", my_basename}
 };
 
 int BUILTIN_NUM = 10;
