@@ -87,14 +87,37 @@ int my_exit(char * buff, int token_num)
     return STATUS;
 }
 
+int my_print(char * buff, int token_num)
+{
+    // skip print 
+    // start printing everything after that 
+    // skip # 
+    int k = strlen(&buff[0]) + 1;
+
+    for ( int curr_token = 1; curr_token < token_num; curr_token++ )
+    {
+        if ( buff[k] == '\0' )
+        {
+            k += (strlen(&buff[k]) + 1 );
+            curr_token--;
+            continue;
+        }
+        
+        printf("%s", &buff[k]);
+        fflush(stdout);
+        k += (strlen(&buff[k]) + 1 );
+    }
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
     {"status", my_status},
-    {"exit", my_exit}
+    {"exit", my_exit},
+    {"print", my_print}
 };
 
-int BUILTIN_NUM = 4;
+int BUILTIN_NUM = 5;
 
 int tokenize(char * buff)
 {   
