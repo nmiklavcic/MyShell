@@ -575,7 +575,7 @@ int my_linklist(char * buff, int token_num)
 
     struct dirent *entry;
     struct stat entry_stat;
-    char entry_path[1024];
+    char entry_path[2048];
     int first = 1;
 
     while ( (entry = readdir(dir)) != NULL )
@@ -667,9 +667,17 @@ int my_cpcat(char * buff, int token_num)
 
     if ( in != 0 ) close(in);
     if ( out != 1 ) close(out);
+
     return 0;
 }
 
+int my_pid(char * buff, int token_num)
+{
+    pid_t pid = getpid();   
+    printf("%d\n", pid);
+
+    return 0;
+}
 
 
 Builtin BUILTINS[] = {
@@ -696,10 +704,11 @@ Builtin BUILTINS[] = {
     {"linksoft", my_linksoft},
     {"linkread", my_linkread},
     {"linklist", my_linklist},
-    {"cpcat", my_cpcat}
+    {"cpcat", my_cpcat},
+    {"pid", my_pid}
 };
 
-int BUILTIN_NUM = 24;
+int BUILTIN_NUM = 25;
 
 int tokenize(char * buff)
 {   
