@@ -679,6 +679,13 @@ int my_pid(char * buff, int token_num)
     return 0;
 }
 
+int my_ppid(char * buff, int token_num)
+{
+    pid_t ppid = getppid();
+    printf("%d\n", ppid);
+
+    return 0;
+}
 
 Builtin BUILTINS[] = {
     {"debug", my_debug},
@@ -705,10 +712,11 @@ Builtin BUILTINS[] = {
     {"linkread", my_linkread},
     {"linklist", my_linklist},
     {"cpcat", my_cpcat},
-    {"pid", my_pid}
+    {"pid", my_pid},
+    {"ppid", my_ppid}
 };
 
-int BUILTIN_NUM = 25;
+int BUILTIN_NUM = 26;
 
 int tokenize(char * buff)
 {   
