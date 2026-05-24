@@ -27,6 +27,8 @@ int BACKGROUND = 0;
 int STATUS = 0;
 int EXIT = 0;
 
+char PROC_PATH[1024] = "/proc";
+
 // section where builtins will live 
 
 int my_debug(char * buff, int token_num)
@@ -677,7 +679,7 @@ int my_pid(char * buff, int token_num)
     pid_t pid = getpid();   
     printf("%d\n", pid);
     fflush(stdout);
-    
+
     return 0;
 }
 
@@ -739,6 +741,36 @@ int my_sysinfo(char * buff, int token_num)
     return 0;
 }
 
+int my_procfs(char * buff, int token_num)
+{
+    // only accept one argument which is the path to the proc file
+    // if no argument is given we print the currenty configuration of proc
+    // default is /proc stored in global PROC_PATH
+
+    if ( token_num == 1 )
+    {
+        printf("%s\n", PROC_PATH);
+        fflush(stdout);
+    }
+    else if ( token_num == 2 )
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        
+        if ( access(&buff[start], F_OK | R_OK) == -1 )
+        {
+            return 1;
+        }
+
+        PROC_PATH = &buff[start];
+    }
+    else
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -770,10 +802,11 @@ Builtin BUILTINS[] = {
     {"euid", my_euid},
     {"gid", my_gid},
     {"egid", my_egid},
-    {"sysinfo", my_sysinfo}
+    {"sysinfo", my_sysinfo},
+    {"procfs", my_procfs}
 };
 
-int BUILTIN_NUM = 31;
+int BUILTIN_NUM = 32;
 
 int tokenize(char * buff)
 {   
