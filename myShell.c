@@ -11,6 +11,7 @@
 #include <sys/utsname.h>
 #include <ctype.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 
 typedef int (*function)(char * buff, int token_num);
@@ -939,10 +940,18 @@ Builtin BUILTINS[] = {
     {"sysinfo", my_sysinfo},
     {"proc", my_proc},
     {"pids", my_pids},
-    {"pinfo", my_pinfo}
+    {"pinfo", my_pinfo},
+    {""}
 };
 
 int BUILTIN_NUM = 34;
+
+
+
+void sigchld_handler(int sig)
+{
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
 
 int tokenize(char * buff)
 {   
@@ -1208,6 +1217,14 @@ int execute_external(char * buff, int token_num)
     }
     else if ( pid == 0 )
     {
+        
+        if (BACKGROUND == 1)
+        {
+            int devnull = open("/dev/null", O_RDONLY);
+            dup2(devnull, 0);
+            close(devnull);
+        }
+
         // child process
         char * args[token_num + 1];
         int k = 0;
@@ -1277,6 +1294,8 @@ int main(int argc, char * argv[])
     
     int token_num = 0;
     
+    signal(SIGCHLD, sigchld_handler);
+
     while (EXIT == 0)
     {
         // reset pub variables
