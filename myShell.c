@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sys/utsname.h>
 #include <ctype.h>
+#include <sys/wait.h>
 
 
 typedef int (*function)(char * buff, int token_num);
@@ -1058,6 +1059,8 @@ int check_redirect(char * buff, int token_num)
         }
         else if ( buff[k] == '&' && strlen(&buff[k]) == 1 )
         {
+            BACKGROUND = 1;
+            buff[k] == '&';
             options_num++;
         }
         else
@@ -1118,7 +1121,6 @@ int print_tokens(char * buff, int token_num, int options_num)
             }
             else if ( buff[start_char] == '&' )
             {
-                BACKGROUND = 1;
                 printf("Background: %d\n", BACKGROUND /*Probably have to implement multiple background tasks in future*/);
                 fflush(stdout);
             }
@@ -1193,8 +1195,46 @@ int execute_builtin(char * buff, int token_num)
     return 0;
 }
 
-int execute_external(char * buff)
+int execute_external(char * buff, int token_num)
 {
+    // to execute the external command we fork() and then exec() and if it is being ran in the foreground we waitpid()
+    // we have to be carefull to account for the path inside of the exec() 
+    fflush(stdin);
+    pid_t pid = fork();
+
+    if ( pid == -1 )
+    {
+        return errno;
+    }
+    else if ( pid == 0 )
+    {
+        // child process
+        char * args[token_num + 1];
+        int k = 0;
+        for ( int i = 0; i < token_num; i++ )
+        {
+            args[i] = &buff[k];
+            k += strlen(&buff[k]) + 1;
+        }
+        args[token_num] = NULL;
+
+        execvp(args[0], args);
+        // if execvp returns, it means there was an error
+        printf("exec: %s\n", strerror(errno));
+        fflush(stdout);
+        exit(127);
+
+    }
+    else
+    {
+        // parent process
+        if ( BACKGROUND == 0 )
+        {
+            int ws;
+            waitpid(pid, &ws, 0);
+            STATUS = WEXITSTATUS(ws);
+        }
+    }
 
     return 0;
 }
@@ -1204,8 +1244,11 @@ int parse(char * buff, int token_num)
     // DEBUG
     // printf("Token count : %d\n", token_num);
 
+    if ( token_num == 0 ) return 0;
+
     int options_num = check_redirect(buff, token_num);
     
+    token_num -= options_num;
     // DEBUG
     // printf("Options count : %d\n", options_num);
 
@@ -1213,7 +1256,7 @@ int parse(char * buff, int token_num)
     IS_BUILTIN = check_builtin(&buff[0]);
 
     // print tokens will only be called if debug is enabled ( DEBUG_LVL > 0 )
-    if ( DEBUG_LVL > 0 ) print_tokens(buff, token_num, options_num);
+    if ( DEBUG_LVL > 0 ) print_tokens(buff, token_num + options_num, options_num);
 
     // execute command
     if ( IS_BUILTIN == 0 )
@@ -1222,7 +1265,7 @@ int parse(char * buff, int token_num)
     }
     else
     {
-        execute_external(buff);
+        execute_external(buff, token_num);
     }
 
     return 0;
@@ -1247,11 +1290,12 @@ int main(int argc, char * argv[])
             break;
         }
         int len = strlen(buff);  
-        
+
         // do stuff only if something is given as input 
-        if (  len > 0 && buff[len - 1] == '\n')
-        buff[len - 1] = '\0';
-        
+        if ( len == 1 && buff[len - 1] == '\n' )
+            continue;
+        else if ( len > 0 && buff[len - 1] == '\n' )
+            buff[len - 1] = '\0';
         token_num = tokenize(buff);
 
         parse(buff, token_num);
