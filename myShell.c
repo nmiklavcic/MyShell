@@ -800,12 +800,102 @@ int my_pids(char * buff, int token_num)
     }
 
     // sort ascending
-    int cmp(const void *a, const void *b) { return (*(int*)a - *(int*)b); }
+    int cmp(const void *a, const void *b) 
+    { 
+        return (*(int*)a - *(int*)b); 
+    }
     qsort(pids, pid_count, sizeof(int), cmp);
 
     for ( int i = 0; i < pid_count; i++ )
     {
         printf("%d\n", pids[i]);
+        fflush(stdout);
+    }
+
+    closedir(dir);
+
+    return 0;
+}
+
+int my_pinfo(char * buff, int token_num)
+{
+    // DEBUG
+    // printf("Starting pinfo");
+    // fflush(stdout);
+
+    DIR * dir = opendir(PROC_PATH);
+    // DEBUG
+    // printf("Opened directory %s\n", PROC_PATH);
+    // fflush(stdout);
+
+    int pid_count = 0;
+    struct dirent * entry;
+
+    // DEBUG
+    // printf("Reading pids from %s\n", PROC_PATH);
+    // fflush(stdout);
+
+    struct pid_info {
+        int pid;
+        int ppid;
+        char state;
+        char name[256];
+    };
+
+    struct pid_info * pids = calloc(32768, sizeof(struct pid_info));
+
+    while ( (entry = readdir(dir)) != NULL )
+    {
+        int falg_pid = 1;
+        for ( int i = 0; entry->d_name[i] != '\0'; i++ )
+        {
+            
+            // DEBUG
+            // printf("Checking if %s is a pid\n", entry->d_name);
+            // fflush(stdout);
+
+            if ( !isdigit(entry->d_name[i]) )
+            {
+                falg_pid = 0;
+                break;
+            }
+        }
+
+        if ( falg_pid )
+        {   
+            // DEBUG
+            // printf("Reading info for pid %d\n", atoi(entry->d_name));
+            // fflush(stdout);
+
+            // we read the stat file of the process to get the ppid, state and name
+            char stat_path[MAX_CHARS];
+            snprintf(stat_path, sizeof(stat_path), "%s/%s/stat", PROC_PATH, entry->d_name);
+            FILE * stat_file = fopen(stat_path, "r");
+            fscanf(stat_file, "%d %s %c %d", &pids[pid_count].pid, pids[pid_count].name, &pids[pid_count].state, &pids[pid_count].ppid);
+
+            // name currently looks like "(bash)"
+            // skip first char '(' and stop before last char ')'
+            int len = strlen(pids[pid_count].name);
+            pids[pid_count].name[len - 1] = '\0';  // remove ')'
+            strcpy(pids[pid_count].name, &pids[pid_count].name[1]);  // remove '('
+            fclose(stat_file);
+            
+            pid_count++;
+        }
+    }
+
+    // sort ascending
+    int cmp(const void *a, const void *b) 
+    { 
+        return ((struct pid_info*)a)->pid - ((struct pid_info*)b)->pid; 
+    }
+    qsort(pids, pid_count, sizeof(struct pid_info), cmp);
+
+    printf("%5s %5s %6s %s\n", "PID", "PPID", "STANJE", "IME");
+    fflush(stdout);
+    for ( int i = 0; i < pid_count; i++ )
+    {
+        printf("%5d %5d %6c %s\n", pids[i].pid, pids[i].ppid, pids[i].state, pids[i].name);
         fflush(stdout);
     }
 
@@ -847,10 +937,11 @@ Builtin BUILTINS[] = {
     {"egid", my_egid},
     {"sysinfo", my_sysinfo},
     {"proc", my_proc},
-    {"pids", my_pids}
+    {"pids", my_pids},
+    {"pinfo", my_pinfo}
 };
 
-int BUILTIN_NUM = 33;
+int BUILTIN_NUM = 34;
 
 int tokenize(char * buff)
 {   
