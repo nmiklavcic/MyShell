@@ -776,7 +776,8 @@ int my_proc(char * buff, int token_num)
 int my_pids(char * buff, int token_num)
 {
     DIR * dir = opendir(PROC_PATH);
-
+    int pids[32768];
+    int pid_count = 0;
     struct dirent * entry;
 
     while ( (entry = readdir(dir)) != NULL )
@@ -793,9 +794,19 @@ int my_pids(char * buff, int token_num)
 
         if ( falg_pid )
         {
-            printf("%s\n", entry->d_name);
-            fflush(stdout);
+            pids[pid_count] = atoi(entry->d_name);
+            pid_count++;
         }
+    }
+
+    // sort ascending
+    int cmp(const void *a, const void *b) { return (*(int*)a - *(int*)b); }
+    qsort(pids, pid_count, sizeof(int), cmp);
+
+    for ( int i = 0; i < pid_count; i++ )
+    {
+        printf("%d\n", pids[i]);
+        fflush(stdout);
     }
 
     closedir(dir);
