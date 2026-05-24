@@ -690,7 +690,7 @@ int my_ppid(char * buff, int token_num)
 int my_uid(char * buff, in token_num)
 {
     uid_t uid = getuid();
-    printf("%D\n", uid);
+    printf("%d\n", uid);
 
     return 0;
 }
@@ -698,7 +698,23 @@ int my_uid(char * buff, in token_num)
 int my_euid(char * buff, in token_num)
 {
     uid_t euid = geteuid();
-    printf("%D\n", euid);
+    printf("%d\n", euid);
+
+    return 0;
+}
+
+int my_gid(char * buff, in token_num)
+{
+    uid_t gid = getgid();
+    printf("%d\n", gid);
+
+    return 0;
+}
+
+int my_egid(char * buff, in token_num)
+{
+    uid_t egid = getegid();
+    printf("%d\n", egid);
 
     return 0;
 }
@@ -731,10 +747,12 @@ Builtin BUILTINS[] = {
     {"pid", my_pid},
     {"ppid", my_ppid},
     {"uid", my_uid},
-    {"euid", my_euid}
+    {"euid", my_euid},
+    {"gid", my_gid},
+    {"egid", my_egid}
 };
 
-int BUILTIN_NUM = 28;
+int BUILTIN_NUM = 30;
 
 int tokenize(char * buff)
 {   
