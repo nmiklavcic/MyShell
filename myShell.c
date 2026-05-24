@@ -724,7 +724,7 @@ int my_sysinfo(char * buff, int token_num)
 {
     struct utsname info;
     uname(&info);
-    printf("System: %s\n", info.sysname);
+    printf("Sysname: %s\n", info.sysname);
     printf("Nodename: %s\n", info.nodename);
     printf("Release: %s\n", info.release);
     printf("Version: %s\n", info.version);
