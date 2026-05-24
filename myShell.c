@@ -741,7 +741,7 @@ int my_sysinfo(char * buff, int token_num)
     return 0;
 }
 
-int my_procfs(char * buff, int token_num)
+int my_proc(char * buff, int token_num)
 {
     // only accept one argument which is the path to the proc file
     // if no argument is given we print the currenty configuration of proc
@@ -761,7 +761,7 @@ int my_procfs(char * buff, int token_num)
             return 1;
         }
 
-        PROC_PATH = &buff[start];
+        strcpy(PROC_PATH, &buff[start]);
     }
     else
     {
@@ -803,7 +803,7 @@ Builtin BUILTINS[] = {
     {"gid", my_gid},
     {"egid", my_egid},
     {"sysinfo", my_sysinfo},
-    {"procfs", my_procfs}
+    {"proc", my_proc}
 };
 
 int BUILTIN_NUM = 32;
