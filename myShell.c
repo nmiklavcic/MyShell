@@ -676,7 +676,8 @@ int my_pid(char * buff, int token_num)
 {
     pid_t pid = getpid();   
     printf("%d\n", pid);
-
+    fflush(stdout);
+    
     return 0;
 }
 
@@ -684,7 +685,7 @@ int my_ppid(char * buff, int token_num)
 {
     pid_t ppid = getppid();
     printf("%d\n", ppid);
-
+    fflush(stdout);
     return 0;
 }
 
@@ -692,6 +693,7 @@ int my_uid(char * buff, int token_num)
 {
     uid_t uid = getuid();
     printf("%d\n", uid);
+    fflush(stdout);
 
     return 0;
 }
@@ -700,6 +702,7 @@ int my_euid(char * buff, int token_num)
 {
     uid_t euid = geteuid();
     printf("%d\n", euid);
+    fflush(stdout);
 
     return 0;
 }
@@ -708,6 +711,7 @@ int my_gid(char * buff, int token_num)
 {
     uid_t gid = getgid();
     printf("%d\n", gid);
+    fflush(stdout);
 
     return 0;
 }
@@ -716,6 +720,7 @@ int my_egid(char * buff, int token_num)
 {
     uid_t egid = getegid();
     printf("%d\n", egid);
+    fflush(stdout);
 
     return 0;
 }
@@ -729,7 +734,8 @@ int my_sysinfo(char * buff, int token_num)
     printf("Release: %s\n", info.release);
     printf("Version: %s\n", info.version);
     printf("Machine: %s\n", info.machine);
-
+    fflush(stdout);
+  
     return 0;
 }
 
