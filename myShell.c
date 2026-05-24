@@ -906,6 +906,57 @@ int my_pinfo(char * buff, int token_num)
     return 0;
 }
 
+int my_waitone(char * buff, int token_num)
+{
+    if ( token_num == 2 )
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        int status;
+        int pid = atoi(&buff[start]);
+        if ( kill(pid, 0) == 0 )
+        {
+            waitpid(pid, &status, 0);
+            STATUS = WEXITSTATUS(status);
+            return STATUS;
+        }
+        else 
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        int start = (int)strlen(&buff[0]) + 1;
+        int status;
+
+        sigset_t mask, old;
+        sigemptyset(&mask);
+        sigaddset(&mask, SIGCHLD);
+        sigprocmask(SIG_BLOCK, &mask, &old);
+        waitpid(-1, &status, 0);
+        sigprocmask(SIG_UNBLOCK, &mask, &old);
+
+        STATUS = WEXITSTATUS(status);
+        return STATUS;
+    }
+}
+
+int my_waitall(char * buff, int token_num)
+{
+    sigset_t mask, old;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+    sigprocmask(SIG_BLOCK, &mask, &old);
+
+    int status;
+    while (waitpid(-1, &status, 0) > 0)
+        STATUS = WEXITSTATUS(status);
+
+    sigprocmask(SIG_UNBLOCK, &mask, &old);
+    return STATUS;
+}
+
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -941,10 +992,11 @@ Builtin BUILTINS[] = {
     {"proc", my_proc},
     {"pids", my_pids},
     {"pinfo", my_pinfo},
-    {""}
+    {"waitone", my_waitone},
+    {"waitall", my_waitall}
 };
 
-int BUILTIN_NUM = 34;
+int BUILTIN_NUM = 36;
 
 
 
@@ -975,7 +1027,11 @@ int tokenize(char * buff)
             // token_num--;
             break;
         }
-        else if( buff[i] == ' ' )
+        else if ( buff[i] == '#' && i == 0 )
+        {
+            break;
+        }
+        else if ( buff[i] == ' ' )
         {
             buff[i] = '\0';
             if ( i == 0 )
@@ -1069,7 +1125,6 @@ int check_redirect(char * buff, int token_num)
         else if ( buff[k] == '&' && strlen(&buff[k]) == 1 )
         {
             BACKGROUND = 1;
-            buff[k] == '&';
             options_num++;
         }
         else
@@ -1198,7 +1253,24 @@ int execute_builtin(char * buff, int token_num)
     {
         if ( strcmp(&buff[0], BUILTINS[i].name) == 0 )
         {
-            STATUS = BUILTINS[i].fn(buff, token_num);
+            if ( BACKGROUND == 1)
+            {   
+                fflush(stdin);
+                pid_t pid = fork();
+                if (pid == 0)
+                {
+                    int devnull = open("/dev/null", O_RDONLY);
+                    dup2(devnull, 0);
+                    close(devnull);
+                    
+                    STATUS = BUILTINS[i].fn(buff, token_num);
+                    exit(STATUS);
+                }
+            }
+            else
+            {
+                STATUS = BUILTINS[i].fn(buff, token_num);
+            }
         }
     }
     return 0;
@@ -1250,6 +1322,7 @@ int execute_external(char * buff, int token_num)
             int ws;
             waitpid(pid, &ws, 0);
             STATUS = WEXITSTATUS(ws);
+            return STATUS;
         }
     }
 
