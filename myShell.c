@@ -9,6 +9,8 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/utsname.h>
+#include <ctype.h>
+
 
 typedef int (*function)(char * buff, int token_num);
 
@@ -771,6 +773,36 @@ int my_proc(char * buff, int token_num)
     return 0;
 }
 
+int my_pids(char * buff, int token_num)
+{
+    DIR * dir = opendir(PROC_PATH);
+
+    struct dirent * entry;
+
+    while ( (entry = readdir(dir)) != NULL )
+    {
+        int falg_pid = 1;
+        for ( int i = 0; entry->d_name[i] != '\0'; i++ )
+        {
+            if ( !isdigit(entry->d_name[i]) )
+            {
+                falg_pid = 0;
+                break;
+            }
+        }
+
+        if ( falg_pid )
+        {
+            printf("%s\n", entry->d_name);
+            fflush(stdout);
+        }
+    }
+
+    closedir(dir);
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -803,10 +835,11 @@ Builtin BUILTINS[] = {
     {"gid", my_gid},
     {"egid", my_egid},
     {"sysinfo", my_sysinfo},
-    {"proc", my_proc}
+    {"proc", my_proc},
+    {"pids", my_pids}
 };
 
-int BUILTIN_NUM = 32;
+int BUILTIN_NUM = 33;
 
 int tokenize(char * buff)
 {   
