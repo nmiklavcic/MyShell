@@ -729,6 +729,8 @@ int my_sysinfo(char * buff, int token_num)
     printf("Release: %s\n", info.release);
     printf("Version: %s\n", info.version);
     printf("Machine: %s\n", info.machine);
+
+    return 0;
 }
 
 Builtin BUILTINS[] = {
