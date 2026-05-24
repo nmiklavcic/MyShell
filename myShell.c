@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <sys/utsname.h>
 
 typedef int (*function)(char * buff, int token_num);
 
@@ -719,6 +720,17 @@ int my_egid(char * buff, int token_num)
     return 0;
 }
 
+int my_sysinfo(char * buff, int token_num)
+{
+    struct utsname info;
+    uname(&info);
+    printf("System: %s\n", info.sysname);
+    printf("Nodename: %s\n", info.nodename);
+    printf("Release: %s\n", info.release);
+    printf("Version: %s\n", info.version);
+    printf("Machine: %s\n", info.machine);
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -749,10 +761,11 @@ Builtin BUILTINS[] = {
     {"uid", my_uid},
     {"euid", my_euid},
     {"gid", my_gid},
-    {"egid", my_egid}
+    {"egid", my_egid},
+    {"sysinfo", my_sysinfo}
 };
 
-int BUILTIN_NUM = 30;
+int BUILTIN_NUM = 31;
 
 int tokenize(char * buff)
 {   
