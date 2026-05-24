@@ -687,6 +687,22 @@ int my_ppid(char * buff, int token_num)
     return 0;
 }
 
+int my_uid(char * buff, in token_num)
+{
+    uid_t uid = getuid();
+    printf("%D\n", uid);
+
+    return 0;
+}
+
+int my_euid(char * buff, in token_num)
+{
+    uid_t euid = geteuid();
+    printf("%D\n", euid);
+
+    return 0;
+}
+
 Builtin BUILTINS[] = {
     {"debug", my_debug},
     {"prompt", my_prompt},
@@ -713,10 +729,12 @@ Builtin BUILTINS[] = {
     {"linklist", my_linklist},
     {"cpcat", my_cpcat},
     {"pid", my_pid},
-    {"ppid", my_ppid}
+    {"ppid", my_ppid},
+    {"uid", my_uid},
+    {"euid", my_euid}
 };
 
-int BUILTIN_NUM = 26;
+int BUILTIN_NUM = 28;
 
 int tokenize(char * buff)
 {   
