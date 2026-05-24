@@ -687,7 +687,7 @@ int my_ppid(char * buff, int token_num)
     return 0;
 }
 
-int my_uid(char * buff, in token_num)
+int my_uid(char * buff, int token_num)
 {
     uid_t uid = getuid();
     printf("%d\n", uid);
@@ -695,7 +695,7 @@ int my_uid(char * buff, in token_num)
     return 0;
 }
 
-int my_euid(char * buff, in token_num)
+int my_euid(char * buff, int token_num)
 {
     uid_t euid = geteuid();
     printf("%d\n", euid);
@@ -703,7 +703,7 @@ int my_euid(char * buff, in token_num)
     return 0;
 }
 
-int my_gid(char * buff, in token_num)
+int my_gid(char * buff, int token_num)
 {
     uid_t gid = getgid();
     printf("%d\n", gid);
@@ -711,7 +711,7 @@ int my_gid(char * buff, in token_num)
     return 0;
 }
 
-int my_egid(char * buff, in token_num)
+int my_egid(char * buff, int token_num)
 {
     uid_t egid = getegid();
     printf("%d\n", egid);
